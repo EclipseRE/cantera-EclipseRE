@@ -7,11 +7,11 @@ on:
       - v*
     # Build when this branch is pushed to
     branches:
-      - 2.5
+      - master
   pull_request:
     # Build when a pull request targets this branch
     branches:
-      - 2.5
+      - master
 
 jobs:
   ubuntu-multiple-pythons:
