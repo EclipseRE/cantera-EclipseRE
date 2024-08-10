@@ -21,14 +21,9 @@ jobs:
       matrix:
         config:
           - {
-            name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
+            name: "Ubuntu Latest", artifact: "Linux.tar.xz",
             os: ubuntu-latest,
             build_type: "Release", cc: "gcc", cxx: "g++"
-          }
-          - {
-            name: "macOS Latest Clang", artifact: "macOS.tar.xz",
-            os: macos-latest,
-            build_type: "Release", cc: "clang", cxx: "clang++"
           }
       fail-fast: false
     steps:
@@ -37,14 +32,10 @@ jobs:
       with:
         submodules: recursive
     - name: Setup conda env
-      run: conda env create -f ./cantera-build.yaml && conda init
-    - name: Activate conda env
-      run: conda activate cantera-build
+      run: conda env create -f ./cantera-build.yaml
     - name: Build Cantera
-      run: scons build python3_package='full'
+      run: conda init && conda activate cantera-build && scons build python3_package='full'
     - name: Test Cantera
-      run: scons test
+      run: conda init && conda activate cantera-build && scons test
     - name: Install Cantera
-      run: scons install
-    - name: Deactivate env
-      run: conda deactivate
+      run: conda init && conda activate cantera-build && scons install
