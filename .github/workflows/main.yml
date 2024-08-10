@@ -33,9 +33,11 @@ jobs:
         submodules: recursive
     - name: Setup conda env
       run: conda env create -f ./cantera-build.yaml
+    - name: Init conda
+      run: conda init
     - name: Build Cantera
-      run: conda init && conda activate cantera-build && scons build python3_package='full'
+      run: conda activate cantera-build && scons build python3_package='full'
     - name: Test Cantera
-      run: conda init && conda activate cantera-build && scons test
+      run: conda activate cantera-build && scons test
     - name: Install Cantera
-      run: conda init && conda activate cantera-build && scons install
+      run: conda activate cantera-build && scons install
