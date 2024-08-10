@@ -45,6 +45,7 @@ config.log
 .project
 .pydevproject
 .settings
+*.conf
 *.gcda
 *.gcno
 *.gch
