@@ -80,52 +80,6 @@ jobs:
     - name: Test Cantera
       run: python3 `which scons` test
 
-  docs:
-    name: Build docs
-    runs-on: ubuntu-latest
-    env:
-      DEPLOY: ${{ github.event_name == 'push' && github.repository_owner == 'Cantera' && endsWith(github.ref, 'main') }}
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout the repository
-        with:
-          submodules: recursive
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-          architecture: x64
-      - name: Install Apt dependencies
-        run: sudo apt-get install libboost-dev doxygen graphviz
-      - name: Upgrade pip
-        run: python3 -m pip install -U pip setuptools wheel
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install ruamel.yaml scons numpy cython sphinx\<4.0 \
-          sphinxcontrib-katex sphinxcontrib-matlabdomain sphinxcontrib-doxylink
-      - name: Build Cantera with documentation
-        run: python3 `which scons` build -j2 doxygen_docs=y sphinx_docs=y
-      # The known_hosts key is generated with `ssh-keygen -F cantera.org` from a
-      # machine that has previously logged in to cantera.org and trusts
-      # that it logged in to the right machine
-      - name: Set up SSH key and host for deploy
-        if: env.DEPLOY == 'true'
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.CTDEPLOY_KEY }}
-          known_hosts: ${{ secrets.CTDEPLOY_HOST }}
-      - name: Upload the docs
-        if: env.DEPLOY == 'true'
-        env:
-          RSYNC_USER: "ctdeploy"
-          RSYNC_SERVER: "cantera.org"
-          RSYNC_DEST: "cantera/documentation/dev"
-          DOCS_OUTPUT_DIR: "./build/docs/"
-        run: |
-          rsync -avzP --checksum --exclude='*.map' --exclude='*.md5' \
-          --exclude='/doxygen/xml' --delete --delete-excluded \
-          "${DOCS_OUTPUT_DIR}" ${RSYNC_USER}@${RSYNC_SERVER}:${RSYNC_DEST}
-
   ubuntu-1804-py2:
     # Ubuntu 18.04 using Python 2 to run SCons and the system Python 3 for the interface
     name: Python 2 running SCons on Ubuntu 18.04
